@@ -1,0 +1,62 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  config:
+    import: "optional:file:.env[.properties]"
+  cloud:
+    gateway:
+      server:
+        webflux:
+          httpclient:
+            connect-timeout: 5000
+            response-timeout: 10s
+          routes:
+            - id: loginApi
+              uri: lb://login-service
+              predicates:
+                - Path=/api/auth/**
+
+            - id: calendarioApi
+              uri: lb://calendario-service
+              predicates:
+                - Path=/api/servicos/*/horarios, /api/calendario/**
+
+            - id: agendamentoApi
+              uri: lb://agendamento-service
+              predicates:
+                - Path=/api/servicos/**, /api/agendamentos/**
+
+            - id: relatorioApi
+              uri: lb://relatorio-service
+              predicates:
+                - Path=/api/relatorio/**
+    discovery:
+      client:
+        simple:
+          instances:
+            login-service:
+              - uri: ${LOGIN_URL:http://localhost:8090}
+            agendamento-service:
+              - uri: ${AGENDAMENTO_URL:http://localhost:8091}
+            calendario-service:
+              - uri: ${CALENDARIO_URL:http://localhost:8092}
+            relatorio-service:
+              - uri: ${RELATORIO_URL:http://localhost:8093}
+
+jwt:
+  secret: ${JWT_SECRET}
+
+cookie:
+  nome: ${COOKIE_NOME:tokenAgendaFlow}
+
+cors:
+  origens:
+    - "http://localhost:8081"
+    - "http://localhost:19006"
+    - "http://localhost:3000"
+    - "http://localhost:5173"
+    - "http://127.0.0.1:8081"
+    - "http://127.0.0.1:5500"

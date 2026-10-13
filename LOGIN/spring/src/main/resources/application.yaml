@@ -1,0 +1,12 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: login-service
+  data:
+    mongodb:
+      uri: ${MONGO_URI:mongodb://localhost:27017/login_db?replicaSet=rs0}
+      auto-index-creation: true
+  config:
+    import: "optional:file:.env[.properties],optional:file:../.env[.properties]"

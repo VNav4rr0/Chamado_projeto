@@ -1,0 +1,25 @@
+﻿services:
+  mongo:
+    image: mongo:7
+    command: ["--replSet", "rs0", "--bind_ip_all", "--port", "27017"]
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongoData:/data/db
+    healthcheck:
+      test: >
+        echo "try { rs.status() } catch (err) { rs.initiate({_id:'rs0',members:[{_id:0,host:'localhost:27017'}]}) }"
+        | mongosh --port 27017 --quiet
+      interval: 5s
+      timeout: 30s
+      retries: 30
+
+  rabbitmq:            # opcional: so para testar sem CloudAMQP
+    image: rabbitmq:3-management
+    profiles: ["rabbitLocal"]
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+volumes:
+  mongoData:
