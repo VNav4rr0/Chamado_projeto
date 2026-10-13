@@ -1,0 +1,11 @@
+server:
+  port: 8093
+
+spring:
+  application:
+    name: relatorio-service
+  config:
+    import: "optional:file:.env[.properties],optional:file:../.env[.properties]"
+
+gateway:
+  url: ${GATEWAY_URL:http://localhost:8080}
