@@ -1,9 +1,5 @@
 package com.vinijoao.login.exception;
 
-import com.vinijoao.login.exception.AcessoNegadoException;
-import com.vinijoao.login.exception.CredenciaisInvalidasException;
-import com.vinijoao.login.exception.RecursoNaoEncontradoException;
-import com.vinijoao.login.exception.RegraDeNegocioException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.ErrorResponse;

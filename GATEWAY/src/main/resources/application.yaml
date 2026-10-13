@@ -17,17 +17,17 @@ spring:
             - id: loginApi
               uri: lb://login-service
               predicates:
-                - Path=/api/auth/**
+                - Path=/api/auth/**, /api/usuarios/**
 
-            - id: calendarioApi
-              uri: lb://calendario-service
+            - id: chamadoApi
+              uri: lb://chamado-service
               predicates:
-                - Path=/api/servicos/*/horarios, /api/calendario/**
+                - Path=/api/chamados/**
 
-            - id: agendamentoApi
-              uri: lb://agendamento-service
+            - id: atendimentoApi
+              uri: lb://atendimento-service
               predicates:
-                - Path=/api/servicos/**, /api/agendamentos/**
+                - Path=/api/atendimento/**
 
             - id: relatorioApi
               uri: lb://relatorio-service
@@ -39,10 +39,10 @@ spring:
           instances:
             login-service:
               - uri: ${LOGIN_URL:http://localhost:8090}
-            agendamento-service:
-              - uri: ${AGENDAMENTO_URL:http://localhost:8091}
-            calendario-service:
-              - uri: ${CALENDARIO_URL:http://localhost:8092}
+            chamado-service:
+              - uri: ${CHAMADO_URL:http://localhost:8091}
+            atendimento-service:
+              - uri: ${ATENDIMENTO_URL:http://localhost:8092}
             relatorio-service:
               - uri: ${RELATORIO_URL:http://localhost:8093}
 
@@ -50,7 +50,7 @@ jwt:
   secret: ${JWT_SECRET}
 
 cookie:
-  nome: ${COOKIE_NOME:tokenAgendaFlow}
+  nome: ${COOKIE_NOME:tokenSuporteTi}
 
 cors:
   origens:

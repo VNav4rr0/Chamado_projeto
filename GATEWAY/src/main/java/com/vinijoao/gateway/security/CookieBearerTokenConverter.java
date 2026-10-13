@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 public class CookieBearerTokenConverter implements ServerAuthenticationConverter {
 
-    @Value("${COOKIE_NOME:tokenAgendaFlow}")
+    @Value("${COOKIE_NOME:tokenSuporteTi}")
     private String cookieNome;
 
     @Override

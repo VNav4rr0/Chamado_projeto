@@ -17,7 +17,7 @@ public record CadastroRequest(
         @Size(min = 6, message = "Senha deve ter ao menos 6 caracteres")
         String senha,
 
-        @Pattern(regexp = "(?i)ADMIN|COMUM", message = "Role invalida")
+        @Pattern(regexp = "(?i)ADMIN|USUARIO", message = "Role invalida")
         String role,
         String codigoAdmin
 ) {

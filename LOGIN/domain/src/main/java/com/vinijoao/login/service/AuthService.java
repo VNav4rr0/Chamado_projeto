@@ -5,8 +5,8 @@ import com.vinijoao.login.exception.CredenciaisInvalidasException;
 import com.vinijoao.login.exception.RecursoNaoEncontradoException;
 import com.vinijoao.login.exception.RegraDeNegocioException;
 import com.vinijoao.login.model.Sessao;
-import com.vinijoao.login.model.Token;
 import com.vinijoao.login.model.Usuario;
+import com.vinijoao.login.model.UsuarioLogado;
 import com.vinijoao.login.model.enumerable.Role;
 import com.vinijoao.login.port.SenhaCodificador;
 import com.vinijoao.login.port.TokenEmissor;
@@ -41,7 +41,7 @@ public class AuthService {
             throw new RegraDeNegocioException("E-mail ja cadastrado.");
         }
 
-        Role role = Role.COMUM;
+        Role role = Role.USUARIO;
         if (roleSolicitada == Role.ADMIN) {
             if (codigoAdminInformado == null || !codigoAdminInformado.equals(codigoAdmin)) {
                 throw new AcessoNegadoException("Codigo de administrador invalido.");
@@ -72,14 +72,14 @@ public class AuthService {
         return new Sessao(usuario, tokenEmissor.emitir(usuario));
     }
 
-    public Usuario consultar(String solicitanteId, boolean solicitanteAdmin, String id) {
-        verificarPermissao(solicitanteId, solicitanteAdmin, id);
+    public Usuario consultar(UsuarioLogado solicitante, String id) {
+        verificarPermissao(solicitante, id);
         return buscarPorId(id);
     }
 
-    public Usuario atualizar(String solicitanteId, boolean solicitanteAdmin, String id,
+    public Usuario atualizar(UsuarioLogado solicitante, String id,
                              String novoNome, String novoEmail, String novaSenha) {
-        verificarPermissao(solicitanteId, solicitanteAdmin, id);
+        verificarPermissao(solicitante, id);
         Usuario existente = buscarPorId(id);
 
         String emailFinal = (novoEmail != null && !novoEmail.isBlank()) ? normalizar(novoEmail) : existente.email();
@@ -93,16 +93,16 @@ public class AuthService {
         return usuarioRepository.save(new Usuario(id, nomeFinal, emailFinal, senhaFinal, existente.role()));
     }
 
-    public void deletar(String solicitanteId, boolean solicitanteAdmin, String id) {
-        verificarPermissao(solicitanteId, solicitanteAdmin, id);
+    public void deletar(UsuarioLogado solicitante, String id) {
+        verificarPermissao(solicitante, id);
         usuarioRepository.deleteById(buscarPorId(id).id());
     }
 
-    private void verificarPermissao(String solicitanteId, boolean solicitanteAdmin, String alvoId) {
-        if (solicitanteId == null || solicitanteId.isBlank()) {
+    private void verificarPermissao(UsuarioLogado solicitante, String alvoId) {
+        if (solicitante == null || solicitante.id() == null || solicitante.id().isBlank()) {
             throw new AcessoNegadoException("Nao autenticado.");
         }
-        if (!solicitanteAdmin && !solicitanteId.equals(alvoId)) {
+        if (!solicitante.admin() && !solicitante.id().equals(alvoId)) {
             throw new AcessoNegadoException("Sem permissao para acessar outro usuario.");
         }
     }

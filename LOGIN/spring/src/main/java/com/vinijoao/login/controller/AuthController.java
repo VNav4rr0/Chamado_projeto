@@ -3,11 +3,10 @@ package com.vinijoao.login.controller;
 import com.vinijoao.login.controller.adapter.AuthControllerAdapter;
 import com.vinijoao.login.controller.dto.request.CadastroRequest;
 import com.vinijoao.login.controller.dto.request.LoginRequest;
-import com.vinijoao.login.controller.dto.response.AuthResponse;
 import com.vinijoao.login.controller.dto.response.UsuarioResponse;
 import com.vinijoao.login.model.Sessao;
-import com.vinijoao.login.model.Token;
 import com.vinijoao.login.model.Usuario;
+import com.vinijoao.login.model.UsuarioLogado;
 import com.vinijoao.login.security.TokenCookieFactory;
 import com.vinijoao.login.service.AuthService;
 import jakarta.validation.Valid;
@@ -28,22 +27,23 @@ public class AuthController {
         this.cookieFactory = cookieFactory;
     }
 
+    // O token vai SO no cookie HttpOnly; o corpo devolve apenas os dados do usuario.
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody CadastroRequest request) {
+    public ResponseEntity<UsuarioResponse> register(@Valid @RequestBody CadastroRequest request) {
         Usuario usuario = authService.cadastrar(request.nome(), request.email(), request.senha(),
                 AuthControllerAdapter.paraRole(request.role()), request.codigoAdmin());
         Sessao sessao = authService.iniciarSessao(usuario);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .header(HttpHeaders.SET_COOKIE, cookieFactory.cookieHeader(sessao.token().value()))
-                .body(AuthControllerAdapter.paraAuthResponse(sessao));
+                .body(AuthControllerAdapter.paraResposta(sessao.usuario()));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+    public ResponseEntity<UsuarioResponse> login(@Valid @RequestBody LoginRequest request) {
         Sessao sessao = authService.autenticar(request.email(), request.senha());
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookieFactory.cookieHeader(sessao.token().value()))
-                .body(AuthControllerAdapter.paraAuthResponse(sessao));
+                .body(AuthControllerAdapter.paraResposta(sessao.usuario()));
     }
 
     @PostMapping("/logout")
@@ -54,13 +54,11 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UsuarioResponse> me(
-            @RequestHeader(value = "X-Usuario-Id", required = false) String usuarioId
-    ) {
-        if (usuarioId == null || usuarioId.isBlank()) {
+    public ResponseEntity<UsuarioResponse> me(UsuarioLogado usuarioLogado) {
+        if (usuarioLogado.id() == null || usuarioLogado.id().isBlank()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        Usuario usuario = authService.buscarPorId(usuarioId);
+        Usuario usuario = authService.buscarPorId(usuarioLogado.id());
         return ResponseEntity.ok(AuthControllerAdapter.paraResposta(usuario));
     }
 }

@@ -4,9 +4,11 @@ server:
 spring:
   application:
     name: login-service
+  # Spring Boot 4: a URI do Mongo fica em spring.mongodb.uri (so auto-index-creation continua em spring.data.mongodb)
+  mongodb:
+    uri: ${MONGO_URI:mongodb://localhost:27017/loginDb?replicaSet=rs0}
   data:
     mongodb:
-      uri: ${MONGO_URI:mongodb://localhost:27017/login_db?replicaSet=rs0}
       auto-index-creation: true
   config:
     import: "optional:file:.env[.properties],optional:file:../.env[.properties]"

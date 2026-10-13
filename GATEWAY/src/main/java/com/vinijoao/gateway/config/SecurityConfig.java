@@ -33,10 +33,11 @@ public class SecurityConfig {
                                 "/api/auth/register",
                                 "/api/auth/login",
                                 "/api/auth/logout").permitAll()
-                        .pathMatchers("/api/relatorio/**", "/api/calendario/**").hasAuthority(ADMIN)
-                        .pathMatchers(HttpMethod.POST, "/api/servicos/**").hasAuthority(ADMIN)
-                        .pathMatchers(HttpMethod.PUT, "/api/servicos/**").hasAuthority(ADMIN)
-                        .pathMatchers(HttpMethod.DELETE, "/api/servicos/**").hasAuthority(ADMIN)
+                        .pathMatchers("/api/relatorio/**").hasAuthority(ADMIN)
+                        .pathMatchers(HttpMethod.GET, "/api/atendimento/categorias").authenticated()
+                        .pathMatchers("/api/atendimento/**").hasAuthority(ADMIN)
+                        .pathMatchers("/api/chamados/**").authenticated()
+                        .pathMatchers("/api/auth/me", "/api/usuarios/**").authenticated()
                         .anyExchange().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
                         .bearerTokenConverter(tokenConverter)

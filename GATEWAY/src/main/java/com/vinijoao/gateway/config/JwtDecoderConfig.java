@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 
 @Configuration
 public class JwtDecoderConfig {
@@ -16,8 +17,9 @@ public class JwtDecoderConfig {
 
     @Bean
     public ReactiveJwtDecoder jwtDecoder() {
+        // UTF-8 explicito: o Login assina o token com os bytes UTF-8 do segredo.
         return NimbusReactiveJwtDecoder.withSecretKey(
-                new SecretKeySpec(secretKey.getBytes(), "HmacSHA256")
+                new SecretKeySpec(secretKey.getBytes(StandardCharsets.UTF_8), "HmacSHA256")
         ).build();
     }
 }

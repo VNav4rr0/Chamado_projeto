@@ -5,6 +5,7 @@ import com.vinijoao.login.exception.CredenciaisInvalidasException;
 import com.vinijoao.login.exception.RegraDeNegocioException;
 import com.vinijoao.login.model.Token;
 import com.vinijoao.login.model.Usuario;
+import com.vinijoao.login.model.UsuarioLogado;
 import com.vinijoao.login.model.enumerable.Role;
 import com.vinijoao.login.port.SenhaCodificador;
 import com.vinijoao.login.port.TokenEmissor;
@@ -83,9 +84,9 @@ class AuthServiceTest {
     }
 
     @Test
-    void cadastrarComumSemRole() {
+    void cadastrarUsuarioSemRole() {
         Usuario usuario = service.cadastrar("Joao", "joao@email.com", "senha123", null, null);
-        assertEquals(Role.COMUM, usuario.role());
+        assertEquals(Role.USUARIO, usuario.role());
     }
 
     @Test
@@ -125,5 +126,34 @@ class AuthServiceTest {
     void autenticarEmailInexistenteDeve401() {
         assertThrows(CredenciaisInvalidasException.class, () ->
                 service.autenticar("naoexiste@email.com", "senha"));
+    }
+
+    @Test
+    void usuarioComumNaoPodeConsultarOutroUsuario() {
+        Usuario joao = service.cadastrar("Joao", "joao@email.com", "senha123", null, null);
+        Usuario maria = service.cadastrar("Maria", "maria@email.com", "senha123", null, null);
+        UsuarioLogado solicitante = new UsuarioLogado(joao.id(), joao.nome(), false);
+        assertThrows(AcessoNegadoException.class, () -> service.consultar(solicitante, maria.id()));
+    }
+
+    @Test
+    void usuarioComumPodeConsultarASiMesmo() {
+        Usuario joao = service.cadastrar("Joao", "joao@email.com", "senha123", null, null);
+        UsuarioLogado solicitante = new UsuarioLogado(joao.id(), joao.nome(), false);
+        assertEquals(joao.id(), service.consultar(solicitante, joao.id()).id());
+    }
+
+    @Test
+    void adminPodeConsultarQualquerUsuario() {
+        Usuario joao = service.cadastrar("Joao", "joao@email.com", "senha123", null, null);
+        UsuarioLogado admin = new UsuarioLogado("qualquer-id", "Admin", true);
+        assertEquals(joao.id(), service.consultar(admin, joao.id()).id());
+    }
+
+    @Test
+    void semIdentidadeDeveNegarAcesso() {
+        Usuario joao = service.cadastrar("Joao", "joao@email.com", "senha123", null, null);
+        UsuarioLogado anonimo = new UsuarioLogado(null, null, false);
+        assertThrows(AcessoNegadoException.class, () -> service.consultar(anonimo, joao.id()));
     }
 }

@@ -26,7 +26,7 @@ class ChamadoService {
     role: 'USUARIO' | 'ADMIN';
     codigoAdmin?: string;
   }): Promise<UsuarioLogado> {
-    return api.post<UsuarioLogado>('/auth/cadastro', dados);
+    return api.post<UsuarioLogado>('/auth/register', dados);
   }
 
   public async logout(): Promise<void> {
