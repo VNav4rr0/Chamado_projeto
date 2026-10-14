@@ -7,7 +7,7 @@ spring:
   mongodb:
     uri: ${MONGO_URI:mongodb://localhost:27017/chamadoDb?replicaSet=rs0}
   rabbitmq:
-    uri: ${CLOUDAMQP_URL:amqp://guest:guest@localhost:5672}
+    addresses: ${CLOUDAMQP_URL:amqp://guest:guest@localhost:5672}
     publisher-confirm-type: correlated
     listener:
       simple:
